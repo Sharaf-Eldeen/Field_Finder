@@ -9,6 +9,7 @@ import SearchIcon from "@mui/icons-material/Search";
 
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import AddStadiumForm from "./AddStadiumForm";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -59,6 +60,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 export default function SearchAppBar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [openSignUp, setOpenSignUp] = useState(false);
+  const [openForm, setOpenForm] = useState(false);
   const [isSigned, setIsSigned] = useState(false);
   const navigate = useNavigate();
   useEffect(() => {
@@ -75,7 +77,17 @@ export default function SearchAppBar() {
     handleCloseSignUp();
     navigate("/signin");
   };
+  const handleClickOpen = () => {
+    if (isSigned) {
+      setOpenForm(true);
+    } else {
+      setOpenSignUp(true);
+    }
+  };
 
+  const handleCloseForm = () => {
+    setOpenForm(false);
+  };
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -119,6 +131,7 @@ export default function SearchAppBar() {
           </Search>
         </Toolbar>
       </AppBar>
+      <AddStadiumForm open={openForm} onClose={handleCloseForm} />
     </Box>
   );
 }
