@@ -2,11 +2,17 @@ import React, { useState, useEffect } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
 import SearchIcon from "@mui/icons-material/Search";
-
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import AddStadiumForm from "./AddStadiumForm";
@@ -132,6 +138,22 @@ export default function SearchAppBar() {
         </Toolbar>
       </AppBar>
       <AddStadiumForm open={openForm} onClose={handleCloseForm} />
+      <Dialog open={openSignUp} onClose={handleCloseSignUp}>
+        <DialogTitle>{"Sign Up Required"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            You need to sign in first to add a stadium.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSignUp} color="primary">
+            Cancel
+          </Button>
+          <Button onClick={handleSignIn} color="primary" autoFocus>
+            Sign In
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 }
