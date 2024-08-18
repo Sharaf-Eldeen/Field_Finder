@@ -2,19 +2,18 @@ import React, { useState, useEffect } from "react";
 import { styled, alpha } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
 import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import InputBase from "@mui/material/InputBase";
-import SearchIcon from "@mui/icons-material/Search";
+import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { Link } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
+import SearchIcon from "@mui/icons-material/Search";
+import IconButton from "@mui/material/IconButton";
+import { Link, useNavigate } from "react-router-dom";
 import AddStadiumForm from "./AddStadiumForm";
 
 const Search = styled("div")(({ theme }) => ({
@@ -64,25 +63,19 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 }));
 
 export default function SearchAppBar() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [openSignUp, setOpenSignUp] = useState(false);
   const [openForm, setOpenForm] = useState(false);
+  const [openSignUp, setOpenSignUp] = useState(false);
   const [isSigned, setIsSigned] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
+
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
     if (token) {
       setIsSigned(true);
     }
   }, []);
-  const handleCloseSignUp = () => {
-    setOpenSignUp(false);
-  };
 
-  const handleSignIn = () => {
-    handleCloseSignUp();
-    navigate("/signin");
-  };
   const handleClickOpen = () => {
     if (isSigned) {
       setOpenForm(true);
@@ -94,6 +87,24 @@ export default function SearchAppBar() {
   const handleCloseForm = () => {
     setOpenForm(false);
   };
+
+  const handleCloseSignUp = () => {
+    setOpenSignUp(false);
+  };
+
+  const handleSignIn = () => {
+    handleCloseSignUp();
+    navigate("/signin");
+  };
+
+  const handleAccountClick = () => {
+    if (isSigned) {
+      navigate("/account");
+    } else {
+      setOpenSignUp(true);
+    }
+  };
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
@@ -101,6 +112,7 @@ export default function SearchAppBar() {
   const handleSearch = () => {
     navigate(`/events?search=${searchTerm}`);
   };
+
   return (
     <Box sx={{ flexGrow: 1 }}>
       <AppBar position="fixed" sx={{ backgroundColor: "#004d40" }}>
@@ -119,6 +131,14 @@ export default function SearchAppBar() {
           >
             KickSpot
           </Typography>
+          <Button
+            variant="contained"
+            color="success"
+            sx={{ marginRight: 2 }}
+            onClick={handleClickOpen}
+          >
+            Add Stadium
+          </Button>
           <Search>
             <SearchIconWrapper>
               <SearchIcon />
@@ -135,6 +155,13 @@ export default function SearchAppBar() {
               inputProps={{ "aria-label": "search" }}
             />
           </Search>
+          <IconButton onClick={handleAccountClick} sx={{ ml: 2 }}>
+            <img
+              src="../public/person.png"
+              alt="Account"
+              style={{ width: 30, height: 30 }}
+            />
+          </IconButton>
         </Toolbar>
       </AppBar>
       <AddStadiumForm open={openForm} onClose={handleCloseForm} />
