@@ -101,6 +101,9 @@ export default function SignUp() {
 
     return errors;
   };
+  const handleGoogleSignIn = () => {
+    window.open("http://localhost:5500/google/auth/google", "_self");
+  };
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container
@@ -198,6 +201,16 @@ export default function SignUp() {
               Sign Up
             </Button>
           </Box>
+        </Box>
+        <Box sx={{ mt: 2 }}>
+          <Button
+            fullWidth
+            variant="outlined"
+            startIcon={<GoogleIcon />}
+            onClick={handleGoogleSignIn}
+          >
+            Sign up with Google
+          </Button>
         </Box>
       </Container>
     </ThemeProvider>
