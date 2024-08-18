@@ -64,6 +64,9 @@ export default function SignUp() {
 
       const result = await response.json();
       localStorage.setItem("jwtToken", result.token);
+
+      navigate("/signin");
+      window.location.reload();
     } catch (error) {
       setFormErrors({ general: "Server error. Please try again later." });
       console.error("Error:", error);
