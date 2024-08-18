@@ -22,6 +22,14 @@ export default function SignUp() {
     email: "",
     password: "",
   });
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+
+    if (formErrors[name] || formErrors.general) {
+      setFormErrors({ ...formErrors, [name]: "", general: "" });
+    }
+  };
 
   const validate = (values) => {
     const errors = {};
