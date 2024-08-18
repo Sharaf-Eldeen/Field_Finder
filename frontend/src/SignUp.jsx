@@ -16,6 +16,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const navigate = useNavigate();
   const [formErrors, setFormErrors] = React.useState({});
   const [formValues, setFormValues] = React.useState({
     username: "",
@@ -38,6 +39,7 @@ export default function SignUp() {
       setFormErrors(errors);
       return;
     }
+
     try {
       const response = await fetch("http://localhost:5500/api/auth/register", {
         method: "POST",
@@ -72,6 +74,7 @@ export default function SignUp() {
       console.error("Error:", error);
     }
   };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
@@ -101,9 +104,11 @@ export default function SignUp() {
 
     return errors;
   };
+
   const handleGoogleSignIn = () => {
     window.open("http://localhost:5500/google/auth/google", "_self");
   };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container
@@ -114,6 +119,8 @@ export default function SignUp() {
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
+          // padding: 2,
+          // marginLeft: "85%",
           marginTop: "55px",
         }}
       >
@@ -191,7 +198,11 @@ export default function SignUp() {
                 />
               </Grid>
             </Grid>
-
+            {formErrors.general && (
+              <Typography color="error" variant="body2">
+                {formErrors.general}
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth
@@ -200,17 +211,24 @@ export default function SignUp() {
             >
               Sign Up
             </Button>
+            <Grid container justifyContent="flex-end">
+              <Grid item>
+                <Link href="/signin" variant="body2">
+                  Already have an account? Sign in
+                </Link>
+              </Grid>
+            </Grid>
+            <Box sx={{ mt: 2 }}>
+              <Button
+                fullWidth
+                variant="outlined"
+                startIcon={<GoogleIcon />}
+                onClick={handleGoogleSignIn}
+              >
+                Sign up with Google
+              </Button>
+            </Box>
           </Box>
-        </Box>
-        <Box sx={{ mt: 2 }}>
-          <Button
-            fullWidth
-            variant="outlined"
-            startIcon={<GoogleIcon />}
-            onClick={handleGoogleSignIn}
-          >
-            Sign up with Google
-          </Button>
         </Box>
       </Container>
     </ThemeProvider>
