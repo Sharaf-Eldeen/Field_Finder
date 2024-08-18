@@ -16,6 +16,33 @@ import GoogleIcon from "@mui/icons-material/Google";
 const defaultTheme = createTheme();
 
 export default function SignUp() {
+  const [formErrors, setFormErrors] = React.useState({});
+  const [formValues, setFormValues] = React.useState({
+    username: "",
+    email: "",
+    password: "",
+  });
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.username) {
+      errors.username = "Username is required";
+    }
+
+    if (!values.email) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
+      errors.email = "Email address is invalid";
+    }
+
+    if (!values.password) {
+      errors.password = "Password is required";
+    } else if (values.password.length < 6) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    return errors;
+  };
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container
