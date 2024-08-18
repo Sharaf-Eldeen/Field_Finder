@@ -58,7 +58,24 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 
 export default function SearchAppBar() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [openSignUp, setOpenSignUp] = useState(false);
+  const [isSigned, setIsSigned] = useState(false);
   const navigate = useNavigate();
+  useEffect(() => {
+    const token = localStorage.getItem("jwtToken");
+    if (token) {
+      setIsSigned(true);
+    }
+  }, []);
+  const handleCloseSignUp = () => {
+    setOpenSignUp(false);
+  };
+
+  const handleSignIn = () => {
+    handleCloseSignUp();
+    navigate("/signin");
+  };
+
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value);
   };
