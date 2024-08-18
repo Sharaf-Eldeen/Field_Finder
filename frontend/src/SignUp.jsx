@@ -38,6 +38,36 @@ export default function SignUp() {
       setFormErrors(errors);
       return;
     }
+    try {
+      const response = await fetch("http://localhost:5500/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+
+        if (response.status === 400) {
+          const validationErrors = {};
+          result.errors.forEach((error) => {
+            validationErrors[error.param] = error.msg;
+          });
+          setFormErrors(validationErrors);
+        } else {
+          setFormErrors({ general: "Server error. Please try again later." });
+        }
+        return;
+      }
+
+      const result = await response.json();
+      localStorage.setItem("jwtToken", result.token);
+    } catch (error) {
+      setFormErrors({ general: "Server error. Please try again later." });
+      console.error("Error:", error);
+    }
   };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
