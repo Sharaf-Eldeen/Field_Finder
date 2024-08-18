@@ -22,6 +22,23 @@ export default function SignUp() {
     email: "",
     password: "",
   });
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    const userData = {
+      username: data.get("username"),
+      email: data.get("email"),
+      password: data.get("password"),
+    };
+
+    const errors = validate(userData);
+    if (Object.keys(errors).length !== 0) {
+      setFormErrors(errors);
+      return;
+    }
+  };
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
