@@ -22,6 +22,9 @@ export default function SignIn() {
     password: "",
   });
   const [formErrors, setFormErrors] = React.useState({});
+  const handleSignUpRedirect = () => {
+    navigate("/signup");
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -161,6 +164,15 @@ export default function SignIn() {
             >
               Sign In
             </Button>
+            <Button
+              fullWidth
+              variant="outlined"
+              startIcon={<GoogleIcon />}
+              sx={{ mt: 1, mb: 2 }}
+              onClick={handleGoogleSignIn}
+            >
+              Sign in with Google
+            </Button>
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
@@ -168,7 +180,7 @@ export default function SignIn() {
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="/signup" variant="body2">
+                <Link href="#" variant="body2" onClick={handleSignUpRedirect}>
                   {"Don't have an account? Sign Up"}
                 </Link>
               </Grid>
