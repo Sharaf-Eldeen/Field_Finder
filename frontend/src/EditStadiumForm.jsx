@@ -12,8 +12,6 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
-// Add input change handling and error validation functions
-
 function EditStadiumForm({ open, onClose, stadium }) {
   const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
@@ -62,7 +60,7 @@ function EditStadiumForm({ open, onClose, stadium }) {
           });
           setErrors({
             ...errors,
-            gpsLocation: "",
+            gpsLocation: "", // Clear the error for GPS location
           });
         },
         (error) => {
