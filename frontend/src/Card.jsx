@@ -6,17 +6,27 @@ import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 
-const EventCard = ({ slug, images, stadium, price }) => {
+const EventCard = ({
+  slug,
+  images,
+  location,
+  stadium,
+  price,
+  details,
+  gps,
+  phone,
+}) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
-    navigate(`/stadium/${slug}`);
+    navigate(`/stadium/${slug}`, {
+      state: { images, location, stadium, price, details, gps, phone },
+    });
   };
 
   return (
     <Box sx={{ margin: "1%", width: "100%", maxWidth: "90%" }}>
       <Card
-        onClick={handleClick}
         sx={{
           width: "100%",
           boxShadow: 10,
@@ -27,6 +37,7 @@ const EventCard = ({ slug, images, stadium, price }) => {
             transform: "scale(1.05)",
           },
         }}
+        onClick={handleClick}
       >
         <CardMedia
           component="img"
@@ -35,7 +46,7 @@ const EventCard = ({ slug, images, stadium, price }) => {
             width: "100%",
           }}
           image={images[0]}
-          alt="Stadium Image"
+          alt="Event Image"
         />
         <CardContent>
           <Typography variant="h5" color="text.secondary">
