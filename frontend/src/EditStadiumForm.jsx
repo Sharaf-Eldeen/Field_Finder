@@ -12,6 +12,8 @@ import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useNavigate } from "react-router-dom";
 
+// Add input change handling and error validation functions
+
 function EditStadiumForm({ open, onClose, stadium }) {
   const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
@@ -29,7 +31,42 @@ function EditStadiumForm({ open, onClose, stadium }) {
   const [pictures, setPictures] = useState([onlyNameOfTheImage]);
   const [errors, setErrors] = useState({});
 
-  // Initial structure with form values and state setup
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({
+      ...formValues,
+      [name]: value,
+    });
+  };
+
+  const handleInputFocus = (e) => {
+    const { name } = e.target;
+    setErrors({
+      ...errors,
+      [name]: "",
+    });
+  };
+
+  const handleFileChange = (e) => {
+    setPictures(Array.from(e.target.files));
+  };
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!formValues.City) newErrors.City = "City is required";
+    if (!formValues.stadiumName)
+      newErrors.stadiumName = "Stadium Name is required";
+    if (!formValues.price || isNaN(formValues.price))
+      newErrors.price = "Valid price is required";
+    if (!formValues.phone || !/^\d+$/.test(formValues.phone))
+      newErrors.phone = "Valid phone number is required";
+    if (!formValues.gpsLocation)
+      newErrors.gpsLocation = "GPS Location is required";
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   return (
     <Dialog open={open} onClose={onClose}>
@@ -42,9 +79,10 @@ function EditStadiumForm({ open, onClose, stadium }) {
           fullWidth
           variant="outlined"
           value={formValues.City}
-          onChange={(e) => {
-            setFormValues({ ...formValues, City: e.target.value });
-          }}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          error={!!errors.City}
+          helperText={errors.City}
         />
         <TextField
           margin="dense"
@@ -53,9 +91,10 @@ function EditStadiumForm({ open, onClose, stadium }) {
           fullWidth
           variant="outlined"
           value={formValues.stadiumName}
-          onChange={(e) => {
-            setFormValues({ ...formValues, stadiumName: e.target.value });
-          }}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          error={!!errors.stadiumName}
+          helperText={errors.stadiumName}
         />
         <TextField
           margin="dense"
@@ -64,9 +103,10 @@ function EditStadiumForm({ open, onClose, stadium }) {
           fullWidth
           variant="outlined"
           value={formValues.price}
-          onChange={(e) => {
-            setFormValues({ ...formValues, price: e.target.value });
-          }}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          error={!!errors.price}
+          helperText={errors.price}
         />
         <TextField
           margin="dense"
@@ -75,9 +115,10 @@ function EditStadiumForm({ open, onClose, stadium }) {
           fullWidth
           variant="outlined"
           value={formValues.phone}
-          onChange={(e) => {
-            setFormValues({ ...formValues, phone: e.target.value });
-          }}
+          onChange={handleInputChange}
+          onFocus={handleInputFocus}
+          error={!!errors.phone}
+          helperText={errors.phone}
         />
         <TextField
           margin="dense"
@@ -88,9 +129,7 @@ function EditStadiumForm({ open, onClose, stadium }) {
           multiline
           rows={4}
           value={formValues.details}
-          onChange={(e) => {
-            setFormValues({ ...formValues, details: e.target.value });
-          }}
+          onChange={handleInputChange}
         />
         <Box display="flex" alignItems="center">
           <TextField
@@ -99,9 +138,10 @@ function EditStadiumForm({ open, onClose, stadium }) {
             name="gpsLocation"
             variant="outlined"
             value={formValues.gpsLocation}
-            onChange={(e) => {
-              setFormValues({ ...formValues, gpsLocation: e.target.value });
-            }}
+            onChange={handleInputChange}
+            onFocus={handleInputFocus}
+            error={!!errors.gpsLocation}
+            helperText={errors.gpsLocation}
             style={{ marginRight: "10px", flex: 1 }}
           />
           <Button onClick={() => {}} variant="contained" color="success">
@@ -110,7 +150,7 @@ function EditStadiumForm({ open, onClose, stadium }) {
         </Box>
         <Box mt={2}>
           <label style={{ marginRight: "1%" }}>Images:</label>
-          <input type="file" multiple onChange={() => {}} />
+          <input type="file" multiple onChange={handleFileChange} />
         </Box>
       </DialogContent>
       <DialogActions>
