@@ -16,6 +16,7 @@ function AddStadiumForm({ open, onClose }) {
     price: "",
     phone: "",
     details: "",
+    gpsLocation: "",
   });
 
   const [pictures, setPictures] = useState([]);
@@ -33,6 +34,26 @@ function AddStadiumForm({ open, onClose }) {
     setPictures(e.target.files);
   };
 
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormValues((prevValues) => ({
+            ...prevValues,
+            gpsLocation: `${latitude},${longitude}`,
+          }));
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+          alert("Unable to retrieve location. Please try again.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
   const validate = () => {
     const newErrors = {};
     if (!formValues.city) newErrors.city = "City is required";
@@ -42,6 +63,8 @@ function AddStadiumForm({ open, onClose }) {
       newErrors.price = "Valid price is required";
     if (!formValues.phone || !/^\d+$/.test(formValues.phone))
       newErrors.phone = "Valid phone number is required";
+    if (!formValues.gpsLocation)
+      newErrors.gpsLocation = "GPS Location is required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -60,8 +83,15 @@ function AddStadiumForm({ open, onClose }) {
       formData.append("images", pictures[i]);
     }
 
-    // Normally you'd send formData to your API here
-    console.log("Form submitted with images:", formData);
+    formData.append(
+      "location",
+      JSON.stringify({
+        type: "Point",
+        coordinates: formValues.gpsLocation.split(",").map(Number),
+      })
+    );
+
+    console.log("Form submitted with location and images:", formData);
     onClose();
   };
 
@@ -124,6 +154,26 @@ function AddStadiumForm({ open, onClose }) {
           value={formValues.details}
           onChange={handleInputChange}
         />
+        <Box display="flex" alignItems="center">
+          <TextField
+            margin="dense"
+            label="GPS Location"
+            name="gpsLocation"
+            variant="outlined"
+            value={formValues.gpsLocation}
+            onChange={handleInputChange}
+            error={!!errors.gpsLocation}
+            helperText={errors.gpsLocation}
+            sx={{ marginRight: 2, flex: 1 }}
+          />
+          <Button
+            onClick={handleGetLocation}
+            variant="contained"
+            color="success"
+          >
+            Get My Location
+          </Button>
+        </Box>
         <Box mt={2}>
           <label style={{ marginRight: "1%" }}>Images:</label>
           <input type="file" multiple onChange={handleFileChange} />
