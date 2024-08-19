@@ -18,6 +18,7 @@ function AddStadiumForm({ open, onClose }) {
     details: "",
   });
 
+  const [pictures, setPictures] = useState([]);
   const [errors, setErrors] = useState({});
 
   const handleInputChange = (e) => {
@@ -26,6 +27,10 @@ function AddStadiumForm({ open, onClose }) {
       ...prevValues,
       [name]: value,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    setPictures(e.target.files);
   };
 
   const validate = () => {
@@ -43,7 +48,20 @@ function AddStadiumForm({ open, onClose }) {
 
   const handleSubmit = () => {
     if (!validate()) return;
-    console.log("Form submitted:", formValues);
+
+    const formData = new FormData();
+    formData.append("name", formValues.stadiumName);
+    formData.append("city", formValues.city);
+    formData.append("pricePerHour", formValues.price);
+    formData.append("ownerPhone", formValues.phone);
+    formData.append("details", formValues.details);
+
+    for (let i = 0; i < pictures.length; i++) {
+      formData.append("images", pictures[i]);
+    }
+
+    // Normally you'd send formData to your API here
+    console.log("Form submitted with images:", formData);
     onClose();
   };
 
@@ -106,6 +124,10 @@ function AddStadiumForm({ open, onClose }) {
           value={formValues.details}
           onChange={handleInputChange}
         />
+        <Box mt={2}>
+          <label style={{ marginRight: "1%" }}>Images:</label>
+          <input type="file" multiple onChange={handleFileChange} />
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
