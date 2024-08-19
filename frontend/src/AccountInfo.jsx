@@ -8,6 +8,8 @@ export default function ProfilePage() {
   const [events, setEvents] = useState([]);
   const [loadingUser, setLoadingUser] = useState(true);
   const [loadingEvents, setLoadingEvents] = useState(true);
+  const [errorUser, setErrorUser] = useState(null);
+  const [errorEvents, setErrorEvents] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
@@ -24,8 +26,12 @@ export default function ProfilePage() {
             setUser(response.data);
             setLoadingUser(false);
           })
-          .catch(() => setLoadingUser(false));
-      } catch {
+          .catch((err) => {
+            setErrorUser(err);
+            setLoadingUser(false);
+          });
+      } catch (err) {
+        setErrorUser(err);
         setLoadingUser(false);
       }
     } else {
@@ -50,8 +56,18 @@ export default function ProfilePage() {
             setEvents(response.data.stadiums);
             setLoadingEvents(false);
           })
-          .catch(() => setLoadingEvents(false));
-      } catch {
+          .catch((err) => {
+            if (err.response?.status === 404) {
+              setErrorEvents({
+                message: "You haven’t created any stadiums yet.",
+              });
+            } else {
+              setErrorEvents(err);
+            }
+            setLoadingEvents(false);
+          });
+      } catch (err) {
+        setErrorEvents(err);
         setLoadingEvents(false);
       }
     } else {
@@ -64,11 +80,15 @@ export default function ProfilePage() {
       <h1>Profile Page</h1>
       {loadingUser ? (
         <p>Loading user data...</p>
+      ) : errorUser ? (
+        <p>Error: {errorUser.message}</p>
       ) : (
         <p>Username: {user?.username}</p>
       )}
       {loadingEvents ? (
         <p>Loading stadiums...</p>
+      ) : errorEvents ? (
+        <p>{errorEvents.message}</p>
       ) : (
         events.map((event) => (
           <EventCard key={event._id} slug={event.slug} stadium={event.name} />
