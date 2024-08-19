@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import EditStadiumForm from "./EditStadiumForm.jsx";
 import axios from "axios";
+import { useState } from "react";
 
 const EventCard = ({
   slug,
@@ -37,29 +38,26 @@ const EventCard = ({
     setOpenForm(false);
   };
 
-  const handleEditSubmitClick = (data) => {
+  const handleEditSubmitClick = () => {
     axios
-      .put(`http://localhost:5500/api/stadiums/${slug}`, data)
+      .put(url, data, config)
       .then((response) => {
-        console.log(`Updated post with slug ${slug}`);
-        setOpenForm(false);
-        window.location.reload();
+        // Handle the response
       })
       .catch((error) => {
-        console.error(error);
+        // Handle errors
       });
   };
-
   const handleDeleteClick = () => {
     axios
       .delete(`http://localhost:5500/api/stadiums/${slug}`)
       .then((response) => {
         console.log(`Deleted post with slug ${slug}`);
-        window.location.reload();
       })
       .catch((error) => {
         console.error(error);
       });
+    window.location.reload();
   };
 
   return (
@@ -116,7 +114,6 @@ const EventCard = ({
           gps,
           phone,
         }}
-        onSubmit={handleEditSubmitClick}
       />
     </Box>
   );
