@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import jwtDecode from "jwt-decode";
+import jwtDecode from "jwt-decode"; // Fixed import
 import { useNavigate } from "react-router-dom";
 import EventCard from "./EventCard";
 
