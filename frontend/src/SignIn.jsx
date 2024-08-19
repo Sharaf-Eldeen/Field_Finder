@@ -14,6 +14,16 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const [formValues, setFormValues] = React.useState({
+    email: "",
+    password: "",
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
   return (
     <ThemeProvider theme={defaultTheme}>
       <Container component="main" maxWidth="xs">
@@ -42,6 +52,8 @@ export default function SignIn() {
               name="email"
               autoComplete="email"
               autoFocus
+              value={formValues.email}
+              onChange={handleInputChange}
             />
             <TextField
               margin="normal"
@@ -52,6 +64,8 @@ export default function SignIn() {
               type="password"
               id="password"
               autoComplete="current-password"
+              value={formValues.password}
+              onChange={handleInputChange}
             />
             <Button
               type="submit"
