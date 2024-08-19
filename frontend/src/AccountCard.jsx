@@ -37,16 +37,29 @@ const EventCard = ({
     setOpenForm(false);
   };
 
+  const handleEditSubmitClick = (data) => {
+    axios
+      .put(`http://localhost:5500/api/stadiums/${slug}`, data)
+      .then((response) => {
+        console.log(`Updated post with slug ${slug}`);
+        setOpenForm(false);
+        window.location.reload();
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+  };
+
   const handleDeleteClick = () => {
     axios
       .delete(`http://localhost:5500/api/stadiums/${slug}`)
       .then((response) => {
         console.log(`Deleted post with slug ${slug}`);
+        window.location.reload();
       })
       .catch((error) => {
         console.error(error);
       });
-    window.location.reload();
   };
 
   return (
@@ -103,6 +116,7 @@ const EventCard = ({
           gps,
           phone,
         }}
+        onSubmit={handleEditSubmitClick}
       />
     </Box>
   );
