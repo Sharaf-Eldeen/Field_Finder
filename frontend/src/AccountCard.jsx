@@ -7,6 +7,7 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
+import EditStadiumForm from "./EditStadiumForm.jsx";
 
 const EventCard = ({
   slug,
@@ -76,6 +77,20 @@ const EventCard = ({
           </Button>
         </CardActions>
       </Card>
+      <EditStadiumForm
+        open={openForm}
+        onClose={handleCloseForm}
+        stadium={{
+          slug,
+          images,
+          location,
+          stadium,
+          price,
+          details,
+          gps,
+          phone,
+        }}
+      />
     </Box>
   );
 };
