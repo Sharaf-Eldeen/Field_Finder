@@ -13,7 +13,18 @@ const EventCard = ({ slug, images, stadium, price }) => {
   };
 
   return (
-    <Card onClick={handleClick} style={{ cursor: "pointer" }}>
+    <Card
+      onClick={handleClick}
+      style={{
+        cursor: "pointer",
+        transition: "transform 0.2s",
+      }}
+      sx={{
+        "&:hover": {
+          transform: "scale(1.05)",
+        },
+      }}
+    >
       <CardMedia
         component="img"
         height="140"
