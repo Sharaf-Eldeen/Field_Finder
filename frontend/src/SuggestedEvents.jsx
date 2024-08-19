@@ -17,7 +17,7 @@ const SuggestedEvents = ({ city }) => {
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get(`http://localhost:5500/api/stadiums`, {
+        const response = await axios.get("http://localhost:5500/api/stadiums", {
           params: {
             city: city,
             limit: numberOfSuggestedStadiums,
@@ -48,11 +48,20 @@ const SuggestedEvents = ({ city }) => {
   };
 
   return (
-    <Box>
+    <Box
+      sx={{
+        marginLeft: "21%",
+        backgroundColor: "lightgrey",
+        padding: "5%",
+        borderRadius: "2%",
+        width: "100%",
+        boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)", // Custom shadow
+      }}
+    >
       <Typography variant="h6" gutterBottom>
         Suggested Stadiums
       </Typography>
-      <Grid container spacing={2}>
+      <Grid container spacing={2} direction="column">
         {suggestedEvents.map((event) => (
           <Grid item key={event.id}>
             <Card
