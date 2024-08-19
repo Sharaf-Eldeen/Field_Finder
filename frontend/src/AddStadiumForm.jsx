@@ -1,4 +1,3 @@
-// Initial basic form with input fields for city, stadium name, price, phone, and details.
 import React, { useState } from "react";
 import {
   Box,
@@ -19,6 +18,8 @@ function AddStadiumForm({ open, onClose }) {
     details: "",
   });
 
+  const [errors, setErrors] = useState({});
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues((prevValues) => ({
@@ -27,7 +28,21 @@ function AddStadiumForm({ open, onClose }) {
     }));
   };
 
+  const validate = () => {
+    const newErrors = {};
+    if (!formValues.city) newErrors.city = "City is required";
+    if (!formValues.stadiumName)
+      newErrors.stadiumName = "Stadium Name is required";
+    if (!formValues.price || isNaN(formValues.price))
+      newErrors.price = "Valid price is required";
+    if (!formValues.phone || !/^\d+$/.test(formValues.phone))
+      newErrors.phone = "Valid phone number is required";
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = () => {
+    if (!validate()) return;
     console.log("Form submitted:", formValues);
     onClose();
   };
@@ -44,6 +59,8 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.city}
           onChange={handleInputChange}
+          error={!!errors.city}
+          helperText={errors.city}
         />
         <TextField
           margin="dense"
@@ -53,6 +70,8 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.stadiumName}
           onChange={handleInputChange}
+          error={!!errors.stadiumName}
+          helperText={errors.stadiumName}
         />
         <TextField
           margin="dense"
@@ -62,6 +81,8 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.price}
           onChange={handleInputChange}
+          error={!!errors.price}
+          helperText={errors.price}
         />
         <TextField
           margin="dense"
@@ -71,6 +92,8 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.phone}
           onChange={handleInputChange}
+          error={!!errors.phone}
+          helperText={errors.phone}
         />
         <TextField
           margin="dense"
