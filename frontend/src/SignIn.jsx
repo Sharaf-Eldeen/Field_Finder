@@ -10,18 +10,85 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useNavigate } from "react-router-dom";
 
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const navigate = useNavigate();
   const [formValues, setFormValues] = React.useState({
     email: "",
     password: "",
   });
+  const [formErrors, setFormErrors] = React.useState({});
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormValues({ ...formValues, [name]: value });
+
+    if (formErrors[name]) {
+      setFormErrors({ ...formErrors, [name]: "" });
+    }
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+
+    const credentials = {
+      email: data.get("email"),
+      password: data.get("password"),
+    };
+
+    const errors = validate(credentials);
+    if (Object.keys(errors).length !== 0) {
+      setFormErrors(errors);
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:5500/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(credentials),
+      });
+
+      if (!response.ok) {
+        const result = await response.json();
+        if (response.status === 404) {
+          setFormErrors({ general: "Invalid email or password" });
+        } else {
+          setFormErrors({ general: "Server error. Please try again later." });
+        }
+        return;
+      }
+
+      const result = await response.json();
+      localStorage.setItem("jwtToken", result.token);
+
+      navigate("/");
+      window.location.reload();
+    } catch (error) {
+      setFormErrors({ general: "Server error. Please try again later." });
+      console.error("Error:", error);
+    }
+  };
+
+  const validate = (values) => {
+    const errors = {};
+    if (!values.email) {
+      errors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(values.email)) {
+      errors.email = "Email address is invalid";
+    }
+
+    if (!values.password) {
+      errors.password = "Password is required";
+    }
+
+    return errors;
   };
 
   return (
@@ -42,7 +109,12 @@ export default function SignIn() {
           <Typography component="h1" variant="h5">
             Sign in
           </Typography>
-          <Box component="form" noValidate sx={{ mt: 1 }}>
+          <Box
+            component="form"
+            onSubmit={handleSubmit}
+            noValidate
+            sx={{ mt: 1 }}
+          >
             <TextField
               margin="normal"
               required
@@ -54,6 +126,8 @@ export default function SignIn() {
               autoFocus
               value={formValues.email}
               onChange={handleInputChange}
+              error={!!formErrors.email}
+              helperText={formErrors.email}
             />
             <TextField
               margin="normal"
@@ -66,7 +140,14 @@ export default function SignIn() {
               autoComplete="current-password"
               value={formValues.password}
               onChange={handleInputChange}
+              error={!!formErrors.password}
+              helperText={formErrors.password}
             />
+            {formErrors.general && (
+              <Typography color="error" variant="body2">
+                {formErrors.general}
+              </Typography>
+            )}
             <Button
               type="submit"
               fullWidth
