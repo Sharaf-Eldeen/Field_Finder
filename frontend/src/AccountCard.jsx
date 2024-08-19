@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import CardMedia from "@mui/material/CardMedia";
+import CardActions from "@mui/material/CardActions";
+import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
@@ -16,12 +18,21 @@ const EventCard = ({
   gps,
   phone,
 }) => {
+  const [openForm, setOpenForm] = useState(false);
   const navigate = useNavigate();
 
   const handleClick = () => {
     navigate(`/stadium/${slug}`, {
       state: { images, location, stadium, price, details, gps, phone },
     });
+  };
+
+  const handleOpenForm = () => {
+    setOpenForm(true);
+  };
+
+  const handleCloseForm = () => {
+    setOpenForm(false);
   };
 
   return (
@@ -37,7 +48,6 @@ const EventCard = ({
             transform: "scale(1.05)",
           },
         }}
-        onClick={handleClick}
       >
         <CardMedia
           component="img"
@@ -47,8 +57,9 @@ const EventCard = ({
           }}
           image={images[0]}
           alt="Event Image"
+          onClick={handleClick}
         />
-        <CardContent>
+        <CardContent onClick={handleClick}>
           <Typography variant="h5" color="text.secondary">
             Stadium: {stadium}
           </Typography>
@@ -56,6 +67,14 @@ const EventCard = ({
             Price: {price}
           </Typography>
         </CardContent>
+        <CardActions>
+          <Button variant="contained" color="info" onClick={handleOpenForm}>
+            Edit
+          </Button>
+          <Button variant="contained" color="error">
+            Delete
+          </Button>
+        </CardActions>
       </Card>
     </Box>
   );
