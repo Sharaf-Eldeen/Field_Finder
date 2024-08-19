@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import jwtDecode from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 import EventCard from "./EventCard";
 
 export default function ProfilePage() {
@@ -10,6 +11,7 @@ export default function ProfilePage() {
   const [loadingEvents, setLoadingEvents] = useState(true);
   const [errorUser, setErrorUser] = useState(null);
   const [errorEvents, setErrorEvents] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("jwtToken");
@@ -75,6 +77,12 @@ export default function ProfilePage() {
     }
   }, []);
 
+  function handleLogout() {
+    localStorage.removeItem("jwtToken");
+    navigate("/");
+    window.location.reload();
+  }
+
   return (
     <section>
       <h1>Profile Page</h1>
@@ -83,7 +91,10 @@ export default function ProfilePage() {
       ) : errorUser ? (
         <p>Error: {errorUser.message}</p>
       ) : (
-        <p>Username: {user?.username}</p>
+        <>
+          <p>Username: {user?.username}</p>
+          <button onClick={handleLogout}>Logout</button>
+        </>
       )}
       {loadingEvents ? (
         <p>Loading stadiums...</p>
