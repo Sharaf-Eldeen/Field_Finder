@@ -3,6 +3,9 @@ import axios from "axios";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import CardMedia from "@mui/material/CardMedia";
 import { useNavigate } from "react-router-dom";
 
 const numberOfSuggestedStadiums = 5;
@@ -51,11 +54,26 @@ const SuggestedEvents = ({ city }) => {
       </Typography>
       <Grid container spacing={2}>
         {suggestedEvents.map((event) => (
-          <Grid item key={event.id} onClick={() => handleCardClick(event)}>
-            <Typography variant="h6">{event.name}</Typography>
-            <Typography variant="body2" color="text.secondary">
-              Price: {event.pricePerHour}
-            </Typography>
+          <Grid item key={event.id}>
+            <Card
+              sx={{ display: "flex", cursor: "pointer" }}
+              onClick={() => handleCardClick(event)}
+            >
+              <CardMedia
+                component="img"
+                sx={{ width: "30%" }}
+                image={event.images[0]}
+                alt="Event Image"
+              />
+              <CardContent>
+                <Typography variant="h6" component="div">
+                  {event.name}
+                </Typography>
+                <Typography variant="body2" color="text.secondary">
+                  Price: {event.pricePerHour}
+                </Typography>
+              </CardContent>
+            </Card>
           </Grid>
         ))}
       </Grid>
