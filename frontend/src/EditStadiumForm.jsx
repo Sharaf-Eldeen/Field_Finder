@@ -51,6 +51,30 @@ function EditStadiumForm({ open, onClose, stadium }) {
     setPictures(Array.from(e.target.files));
   };
 
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setFormValues({
+            ...formValues,
+            gpsLocation: `${latitude},${longitude}`,
+          });
+          setErrors({
+            ...errors,
+            gpsLocation: "",
+          });
+        },
+        (error) => {
+          console.error("Error fetching location:", error);
+          alert("Unable to retrieve location. Please try again.");
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
   const validate = () => {
     const newErrors = {};
 
@@ -66,6 +90,52 @@ function EditStadiumForm({ open, onClose, stadium }) {
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async () => {
+    if (!validate()) return;
+    const token = localStorage.getItem("jwtToken");
+    const decoded = jwtDecode(token);
+    const email = decoded.userEmail;
+
+    const formData = new FormData();
+
+    formData.append("name", formValues.stadiumName);
+    formData.append("city", formValues.City);
+    formData.append("pricePerHour", formValues.price);
+    formData.append("ownerPhone", formValues.phone);
+    formData.append("details", formValues.details);
+    formData.append("email", email);
+
+    for (let i = 0; i < pictures.length; i++) {
+      formData.append("images", pictures[i]);
+    }
+
+    formData.append(
+      "location",
+      JSON.stringify({
+        type: "Point",
+        coordinates: formValues.gpsLocation.split(",").map(Number),
+      })
+    );
+
+    try {
+      const response = await axios.put(
+        `http://localhost:5500/api/stadiums/${stadium.slug}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Stadium updated:", response.data);
+      onClose();
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating stadium:", error);
+    }
   };
 
   return (
@@ -144,7 +214,11 @@ function EditStadiumForm({ open, onClose, stadium }) {
             helperText={errors.gpsLocation}
             style={{ marginRight: "10px", flex: 1 }}
           />
-          <Button onClick={() => {}} variant="contained" color="success">
+          <Button
+            onClick={handleGetLocation}
+            variant="contained"
+            color="success"
+          >
             Get My Location
           </Button>
         </Box>
@@ -155,7 +229,7 @@ function EditStadiumForm({ open, onClose, stadium }) {
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Cancel</Button>
-        <Button onClick={() => {}}>Submit</Button>
+        <Button onClick={handleSubmit}>Submit</Button>
       </DialogActions>
     </Dialog>
   );
