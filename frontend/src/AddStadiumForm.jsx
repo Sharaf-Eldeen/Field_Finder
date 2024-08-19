@@ -8,10 +8,14 @@ import {
   DialogTitle,
   TextField,
 } from "@mui/material";
+import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+import { useNavigate } from "react-router-dom";
 
 function AddStadiumForm({ open, onClose }) {
+  const navigate = useNavigate();
   const [formValues, setFormValues] = useState({
-    city: "",
+    City: "",
     stadiumName: "",
     price: "",
     phone: "",
@@ -24,10 +28,18 @@ function AddStadiumForm({ open, onClose }) {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormValues((prevValues) => ({
-      ...prevValues,
+    setFormValues({
+      ...formValues,
       [name]: value,
-    }));
+    });
+  };
+
+  const handleInputFocus = (e) => {
+    const { name } = e.target;
+    setErrors({
+      ...errors,
+      [name]: "",
+    });
   };
 
   const handleFileChange = (e) => {
@@ -39,10 +51,14 @@ function AddStadiumForm({ open, onClose }) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          setFormValues((prevValues) => ({
-            ...prevValues,
+          setFormValues({
+            ...formValues,
             gpsLocation: `${latitude},${longitude}`,
-          }));
+          });
+          setErrors({
+            ...errors,
+            gpsLocation: "", // Clear the error for GPS location
+          });
         },
         (error) => {
           console.error("Error fetching location:", error);
@@ -56,7 +72,8 @@ function AddStadiumForm({ open, onClose }) {
 
   const validate = () => {
     const newErrors = {};
-    if (!formValues.city) newErrors.city = "City is required";
+
+    if (!formValues.City) newErrors.City = "City is required";
     if (!formValues.stadiumName)
       newErrors.stadiumName = "Stadium Name is required";
     if (!formValues.price || isNaN(formValues.price))
@@ -65,19 +82,25 @@ function AddStadiumForm({ open, onClose }) {
       newErrors.phone = "Valid phone number is required";
     if (!formValues.gpsLocation)
       newErrors.gpsLocation = "GPS Location is required";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!validate()) return;
+    const token = localStorage.getItem("jwtToken");
+    const decoded = jwtDecode(token);
+    const email = decoded.userEmail;
 
     const formData = new FormData();
+
     formData.append("name", formValues.stadiumName);
-    formData.append("city", formValues.city);
+    formData.append("city", formValues.City);
     formData.append("pricePerHour", formValues.price);
     formData.append("ownerPhone", formValues.phone);
     formData.append("details", formValues.details);
+    formData.append("email", email);
 
     for (let i = 0; i < pictures.length; i++) {
       formData.append("images", pictures[i]);
@@ -87,12 +110,27 @@ function AddStadiumForm({ open, onClose }) {
       "location",
       JSON.stringify({
         type: "Point",
-        coordinates: formValues.gpsLocation.split(",").map(Number),
+        coordinates: formValues.gpsLocation.split(",").map(Number), // assuming GPS location is comma-separated
       })
     );
 
-    console.log("Form submitted with location and images:", formData);
-    onClose();
+    try {
+      const response = await axios.post(
+        "http://localhost:5500/api/stadiums",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+
+      console.log("Stadium created:", response.data);
+      onClose();
+      navigate("/");
+    } catch (error) {
+      console.error("Error creating stadium:", error);
+    }
   };
 
   return (
@@ -102,13 +140,14 @@ function AddStadiumForm({ open, onClose }) {
         <TextField
           margin="dense"
           label="City"
-          name="city"
+          name="City"
           fullWidth
           variant="outlined"
-          value={formValues.city}
+          value={formValues.City}
           onChange={handleInputChange}
-          error={!!errors.city}
-          helperText={errors.city}
+          onFocus={handleInputFocus}
+          error={!!errors.City}
+          helperText={errors.City}
         />
         <TextField
           margin="dense"
@@ -118,6 +157,7 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.stadiumName}
           onChange={handleInputChange}
+          onFocus={handleInputFocus}
           error={!!errors.stadiumName}
           helperText={errors.stadiumName}
         />
@@ -129,6 +169,7 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.price}
           onChange={handleInputChange}
+          onFocus={handleInputFocus}
           error={!!errors.price}
           helperText={errors.price}
         />
@@ -140,6 +181,7 @@ function AddStadiumForm({ open, onClose }) {
           variant="outlined"
           value={formValues.phone}
           onChange={handleInputChange}
+          onFocus={handleInputFocus}
           error={!!errors.phone}
           helperText={errors.phone}
         />
@@ -162,9 +204,10 @@ function AddStadiumForm({ open, onClose }) {
             variant="outlined"
             value={formValues.gpsLocation}
             onChange={handleInputChange}
+            onFocus={handleInputFocus}
             error={!!errors.gpsLocation}
             helperText={errors.gpsLocation}
-            sx={{ marginRight: 2, flex: 1 }}
+            style={{ marginRight: "10px", flex: 1 }}
           />
           <Button
             onClick={handleGetLocation}
