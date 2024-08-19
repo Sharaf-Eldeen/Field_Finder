@@ -8,6 +8,7 @@ import Typography from "@mui/material/Typography";
 import { useNavigate } from "react-router-dom";
 import Box from "@mui/material/Box";
 import EditStadiumForm from "./EditStadiumForm.jsx";
+import axios from "axios";
 
 const EventCard = ({
   slug,
@@ -34,6 +35,18 @@ const EventCard = ({
 
   const handleCloseForm = () => {
     setOpenForm(false);
+  };
+
+  const handleDeleteClick = () => {
+    axios
+      .delete(`http://localhost:5500/api/stadiums/${slug}`)
+      .then((response) => {
+        console.log(`Deleted post with slug ${slug}`);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
+    window.location.reload();
   };
 
   return (
@@ -72,7 +85,7 @@ const EventCard = ({
           <Button variant="contained" color="info" onClick={handleOpenForm}>
             Edit
           </Button>
-          <Button variant="contained" color="error">
+          <Button variant="contained" color="error" onClick={handleDeleteClick}>
             Delete
           </Button>
         </CardActions>
