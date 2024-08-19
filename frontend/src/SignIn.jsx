@@ -11,6 +11,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useNavigate } from "react-router-dom";
+import GoogleIcon from "@mui/icons-material/Google";
 
 const defaultTheme = createTheme();
 
@@ -29,6 +30,10 @@ export default function SignIn() {
     if (formErrors[name]) {
       setFormErrors({ ...formErrors, [name]: "" });
     }
+  };
+
+  const handleGoogleSignIn = () => {
+    window.location.href = "http://localhost:5500/api/auth/google";
   };
 
   const handleSubmit = async (event) => {
