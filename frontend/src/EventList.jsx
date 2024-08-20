@@ -1,11 +1,4 @@
-import React, { useState, useEffect } from "react";
-import Box from "@mui/material/Box";
-import Grid from "@mui/material/Grid";
-import Pagination from "@mui/material/Pagination";
-import EventCard from "./Card.jsx";
-import { useLocation, useNavigate } from "react-router-dom";
-
-const itemsPerPage = 12;
+import axios from "axios";
 
 const EventList = () => {
   const location = useLocation();
@@ -15,8 +8,27 @@ const EventList = () => {
   const [totalPages, setTotalPages] = useState(1);
 
   useEffect(() => {
-    // Placeholder for future implementation
-  }, [location, page, navigate]);
+    const urlParams = new URLSearchParams(location.search);
+    const searchTerm = urlParams.get("search") || "";
+
+    const fetchEvents = async (pageNum) => {
+      try {
+        const response = await axios.get(`http://localhost:5500/api/stadiums`, {
+          params: {
+            page: pageNum,
+            limit: itemsPerPage,
+            city: searchTerm,
+          },
+        });
+        setEvents(response.data.stadiums);
+        setTotalPages(response.data.totalPages);
+      } catch (error) {
+        console.error("Error fetching events: ", error);
+      }
+    };
+
+    fetchEvents(page);
+  }, [location, page]);
 
   const handleChange = (event, value) => {
     setPage(value);
@@ -32,11 +44,24 @@ const EventList = () => {
           marginLeft: "auto",
           marginRight: "auto",
           marginTop: "5%",
-          maxWidth: "100%", // Adjusting maxWidth to make it responsive
+          maxWidth: "100%",
         }}
       >
         <Grid container spacing={2}>
-          {/* Placeholder for EventCard rendering */}
+          {events.map((event) => (
+            <Grid item xs={12} sm={6} md={4} key={event._id}>
+              <EventCard
+                slug={event.slug}
+                images={event.images}
+                location={event.city}
+                stadium={event.name}
+                price={event.pricePerHour}
+                details={event.details}
+                phone={event.ownerPhone}
+                gps={event.location}
+              />
+            </Grid>
+          ))}
         </Grid>
         <Box sx={{ display: "flex", justifyContent: "center", marginTop: 2 }}>
           <Pagination
