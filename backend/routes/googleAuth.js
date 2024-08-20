@@ -40,4 +40,11 @@ router.get("/logout", (req, res) => {
   });
 });
 
+router.get("/profile", (req, res) => {
+  if (!req.isAuthenticated()) {
+    return res.redirect("/");
+  }
+  res.json(req.user);
+});
+
 module.exports = router;
