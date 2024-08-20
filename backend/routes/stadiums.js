@@ -14,6 +14,16 @@ router.post(
     check("name", "Name is required").not().isEmpty(),
     check("city", "City is required").not().isEmpty(),
     check("email", "Email is required").not().isEmpty(),
+    // check("details", "Details are required").not().isEmpty(),
+    // check("location.type", "Location type is required").equals("Point"),
+    // check(
+    //   "location.coordinates",
+    //   "Location coordinates must be an array"
+    // ).isArray(),
+    // check(
+    //   "location.coordinates.*",
+    //   "Location coordinates must be numbers"
+    // ).isNumeric(),
     check("pricePerHour", "Price per hour must be a number").isNumeric(),
     check("ownerPhone", "Owner phone must be a number").isNumeric(),
   ],
@@ -49,6 +59,33 @@ router.post(
     }
   }
 );
+
+/// Get all stadiums by email
+router.get("/findMyOwnStaduims", async (req, res) => {
+  try {
+    const email = req.query.email;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ message: "Email query parameter is required" });
+    }
+
+    const stadiums = await Stadium.find({ email: email });
+    if (!stadiums || stadiums.length === 0) {
+      return res.status(404).json({ message: "Stadium not found" });
+    }
+
+    const updatedStadiums = stadiums.map((stadium) => ({
+      ...stadium._doc,
+      images: stadium.images.map((image) => `http://localhost:5500/${image}`),
+    }));
+
+    res.status(200).json({ stadiums: updatedStadiums });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
 
 // Get all stadiums
 router.get("/", async (req, res) => {
