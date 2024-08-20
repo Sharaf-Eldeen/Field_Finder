@@ -12,6 +12,7 @@ function App() {
   return (
     <>
       <Router>
+        <SearchAppBar />
         <Routes>
           <Route path="/" element={<EventList />} />
           <Route path="/events" element={<EventList />} />
