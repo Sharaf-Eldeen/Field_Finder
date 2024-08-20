@@ -1,11 +1,13 @@
-function checkFileType(file, cb) {
-  const allowedFileTypes = ["jpg", "jpeg", "png", "gif"];
-  const fileType = file.mimetype.split("/")[1];
-  if (allowedFileTypes.includes(fileType)) {
-    cb(null, true);
-  } else {
-    cb("Error: Images Only!");
-  }
-}
+const multer = require("multer");
+const storage = require("./storageConfig");
+const checkFileType = require("./fileTypeValidator");
 
-module.exports = checkFileType;
+const upload = multer({
+  storage: storage,
+  limits: { fileSize: 3000000 },
+  fileFilter: (req, file, cb) => {
+    checkFileType(file, cb);
+  },
+}).array("images", 10);
+
+module.exports = upload;
