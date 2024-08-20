@@ -32,7 +32,7 @@ const stadiumSchema = new mongoose.Schema({
       validator: function (v) {
         return /^01\d{9}$/.test(v);
       },
-      message: (props) => `${props.value} is not a valid phone number!`,
+      message: (props) => ` ${props.value} is not a valid phone number!`,
     },
   },
   slug: {
