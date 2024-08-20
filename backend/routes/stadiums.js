@@ -103,4 +103,88 @@ router.get("/:slug", async (req, res) => {
   }
 });
 
+// Update a stadium by slug
+router.put(
+  "/:slug",
+  uploader,
+  [
+    check("name", "Name is required").optional().not().isEmpty(),
+    check("city", "City is required").optional().not().isEmpty(),
+    check("email", "Email is required").optional().not().isEmpty(),
+    check("location.type", "Location type is required")
+      .optional()
+      .equals("Point"),
+    check("location.coordinates", "Location coordinates must be an array")
+      .optional()
+      .isArray(),
+    check("location.coordinates.*", "Location coordinates must be numbers")
+      .optional()
+      .isNumeric(),
+    check("pricePerHour", "Price per hour must be a number")
+      .optional()
+      .isNumeric(),
+    check("ownerPhone", "Owner phone must be a number").optional().isNumeric(),
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    // Parse the location if it's sent as a string
+    if (req.body.location) {
+      try {
+        req.body.location = JSON.parse(req.body.location);
+      } catch (error) {
+        return res.status(400).json({ message: "Invalid location format" });
+      }
+    }
+
+    const updates = req.body;
+    const images = req.files.map((file) => file.filename);
+
+    if (updates.name) {
+      updates.slug = slugify(updates.name, { lower: true, strict: true });
+    }
+
+    try {
+      // First update: Handle all fields except images
+      const stadium = await Stadium.findOneAndUpdate(
+        { slug: req.params.slug },
+        updates,
+        { new: true }
+      );
+      if (!stadium) {
+        return res.status(404).json({ message: "Stadium not found" });
+      }
+
+      // Second update: Push new images into the array
+      if (images.length > 0) {
+        await Stadium.findOneAndUpdate(
+          { slug: req.params.slug },
+          { $push: { images: { $each: images } } },
+          { new: true }
+        );
+      }
+
+      res.status(200).json(stadium);
+    } catch (error) {
+      res.status(500).json({ message: "Server error" });
+    }
+  }
+);
+
+// Delete a stadium by slug
+router.delete("/:slug", async (req, res) => {
+  try {
+    const stadium = await Stadium.findOneAndDelete({ slug: req.params.slug });
+    if (!stadium) {
+      return res.status(404).json({ message: "Stadium not found" });
+    }
+    res.status(200).json({ message: "Stadium deleted" });
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
