@@ -52,6 +52,8 @@ const stadiumSchema = new mongoose.Schema({
   },
 });
 
+stadiumSchema.index({ location: "2dsphere" });
+
 stadiumSchema.pre("save", function (next) {
   if (this.isModified("name")) {
     this.slug = slugify(this.name, { lower: true, strict: true });
