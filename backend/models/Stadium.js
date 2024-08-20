@@ -28,6 +28,12 @@ const stadiumSchema = new mongoose.Schema({
   ownerPhone: {
     type: String,
     required: true,
+    validate: {
+      validator: function (v) {
+        return /^01\d{9}$/.test(v);
+      },
+      message: (props) => `${props.value} is not a valid phone number!`,
+    },
   },
   slug: {
     type: String,
